@@ -1,0 +1,22 @@
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.filter-button {
+    padding: 10px 20px;
+    border: 1px solid #1D6154;
+    border-radius: 60px;
+
+    font-family: 'Syne';
+    font-weight: 700;
+    color: #1D6154;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.filter-button.active {
+    background-color: #1D6154;
+    color: white;
+}
