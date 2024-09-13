@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Connexion réussie
                 localStorage.setItem('authToken', data.token); // Stocke le token d'authentification
                 localStorage.setItem('userId', data.userId); // Stocke l'ID de l'utilisateur si nécessaire
-                window.location.href = '/index.html'; // Redirection vers la page d'accueil
+                window.location.href = './index.html'; // Redirection vers la page d'accueil
             } else {
                 // Affiche un message d'erreur
                 displayError(data.message || 'Erreur de connexion. Veuillez vérifier vos identifiants.');
