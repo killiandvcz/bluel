@@ -1,5 +1,5 @@
-
 let allWorks = [];
+
 
 // Fonction pour récupérer les works depuis l'API
 async function fetchWorks() {
@@ -16,6 +16,7 @@ async function fetchWorks() {
     }
 }
 
+
 // Fonction pour récupérer les catégories depuis l'API
 async function fetchCategories() {
     try {
@@ -30,6 +31,7 @@ async function fetchCategories() {
     }
 }
 
+
 // Fonction pour créer un élément de galerie
 function createGalleryItem(work) {
     const figure = document.createElement('figure');
@@ -43,6 +45,7 @@ function createGalleryItem(work) {
     return figure;
 }
 
+
 // Fonction pour afficher les works dans la galerie
 function displayWorks(works) {
     const gallery = document.querySelector('.gallery');
@@ -52,6 +55,7 @@ function displayWorks(works) {
         gallery.appendChild(galleryItem);
     });
 }
+
 
 // Fonction pour créer les boutons de filtrage
 function createFilterButtons(categories) {
@@ -78,6 +82,7 @@ function createFilterButtons(categories) {
     filterContainer.addEventListener('click', filterWorks);
 }
 
+
 // Fonction pour filtrer les works
 function filterWorks(event) {
     if (event.target.classList.contains('filter-button')) {
@@ -98,6 +103,7 @@ function filterWorks(event) {
     }
 }
 
+
 // Fonction principale
 async function initGallery() {
     allWorks = await fetchWorks();
@@ -105,6 +111,7 @@ async function initGallery() {
     createFilterButtons(categories);
     displayWorks(allWorks);
 }
+
 
 // Exécuter la fonction principale au chargement de la page
 document.addEventListener('DOMContentLoaded', initGallery);

@@ -20,3 +20,23 @@
     background-color: #1D6154;
     color: white;
 }
+
+
+my-edithead{
+    width: 100%;
+}
+.editHead{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 60px;
+    background: #000000;
+    color: white;
+    .edit{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+}
