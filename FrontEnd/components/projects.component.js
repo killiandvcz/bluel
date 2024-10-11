@@ -2,7 +2,7 @@
 import { auth } from "../scripts/auth.class.js";
 
 class Modal extends HTMLElement {
-    constructor(projects, closeModal, categories, onProjectAdded) {
+    constructor(projects, closeModal, categories, onProjectAdded, onProjectDeleted) {
         super();
         this.projects = projects;
         this.closeModal = closeModal;
@@ -11,6 +11,7 @@ class Modal extends HTMLElement {
         this.isAddingPhoto = false;
         this.selectedFile = null;
         this.onProjectAdded = onProjectAdded;
+        this.onProjectDeleted = onProjectDeleted;
     }
 
     connectedCallback() {
@@ -57,6 +58,15 @@ class Modal extends HTMLElement {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handleSubmit();
+            });
+        }
+
+        if (!this.isAddingPhoto) {
+            this.querySelectorAll('.delete-icon').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    const projectId = e.target.closest('.gallery-item').dataset.projectId;
+                    this.handleDeleteProject(projectId);
+                });
             });
         }
     }
@@ -108,6 +118,33 @@ class Modal extends HTMLElement {
         } catch (error) {
             console.error('Erreur lors de l\'ajout du projet:', error);
             alert('Une erreur est survenue lors de l\'ajout du projet. Veuillez réessayer.');
+        }
+    }
+
+    async handleDeleteProject(projectId) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
+            try {
+                const response = await fetch(`http://localhost:5678/api/works/${projectId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${auth.token}`
+                    }
+                });
+
+                console.log('Réponse de la suppression:', response);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Suppression réussie, mettre à jour l'interface
+                this.onProjectDeleted(projectId);
+                this.projects = this.projects.filter(project => project.id != projectId);
+                this.render();
+            } catch (error) {
+                console.error('Erreur lors de la suppression du projet:', error);
+                alert('Une erreur est survenue lors de la suppression du projet. Veuillez réessayer.');
+            }
         }
     }
 
@@ -263,7 +300,7 @@ class Modal extends HTMLElement {
                 </div>
                 <div class="gallery-grid">
                     ${this.projects.map(project => `
-                        <div class="gallery-item">
+                        <div class="gallery-item" data-project-id="${project.id}">
                             <img src="${project.imageUrl}" alt="${project.title}">
                             <span class="delete-icon">🗑️</span>
                         </div>
@@ -564,7 +601,8 @@ export class Projects extends HTMLElement {
                 this.projects,
                 this.closeModal.bind(this),
                 this.categories,
-                this.onProjectAdded.bind(this)
+                this.onProjectAdded.bind(this),
+                this.onProjectDeleted.bind(this)
             );
             document.body.appendChild(modal);
             this.isModalOpen = true;
@@ -573,6 +611,11 @@ export class Projects extends HTMLElement {
 
     onProjectAdded(newProject) {
         this.projects.push(newProject);
+        this.updateView();
+    }
+
+    onProjectDeleted(projectId) {
+        this.projects = this.projects.filter(project => project.id != projectId);
         this.updateView();
     }
 
