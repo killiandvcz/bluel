@@ -2,10 +2,15 @@
 import { auth } from "../scripts/auth.class.js";
 
 class Modal extends HTMLElement {
-    constructor(projects, closeModal) {
+    constructor(projects, closeModal, categories, onProjectAdded) {
         super();
         this.projects = projects;
         this.closeModal = closeModal;
+        this.isAddingPhoto = false;
+        this.categories = categories;
+        this.isAddingPhoto = false;
+        this.selectedFile = null;
+        this.onProjectAdded = onProjectAdded;
     }
 
     connectedCallback() {
@@ -20,10 +25,140 @@ class Modal extends HTMLElement {
                 this.closeModal();
             }
         });
+        this.querySelector('.add-photo-btn')?.addEventListener('click', () => {
+            this.isAddingPhoto = true;
+            this.render();
+        });
+        this.querySelector('.back-modal')?.addEventListener('click', () => {
+            this.isAddingPhoto = false;
+            this.render();
+        });
+
+        if (this.isAddingPhoto) {
+            const fileInput = this.querySelector('#file-upload');
+            const photoUploadBtn = this.querySelector('.photo-upload-btn');
+            const form = this.querySelector('.add-photo-form');
+
+            fileInput.addEventListener('change', (e) => {
+                this.handleFileSelection(e);
+            });
+
+            photoUploadBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            form.addEventListener('input', () => {
+                this.validateForm();
+            });
+        }
+
+        if (this.isAddingPhoto) {
+            const form = this.querySelector('.add-photo-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleSubmit();
+            });
+        }
+    }
+
+    async handleSubmit() {
+        const titre = this.querySelector('#titre').value;
+        const categorie = this.querySelector('#categorie').value;
+
+        if (!this.selectedFile || !titre || !categorie) {
+            alert("Veuillez remplir tous les champs et sélectionner une image.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', this.selectedFile);
+        formData.append('title', titre);
+        formData.append('category', categorie);
+
+        try {
+            const response = await fetch('http://localhost:5678/api/works', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${auth.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Projet ajouté avec succès:', result);
+
+            // Réinitialiser le formulaire
+            this.querySelector('.add-photo-form').reset();
+            this.selectedFile = null;
+            this.querySelector('.photo-upload-area').innerHTML = this.getPhotoUploadAreaContent();
+
+            // Mettre à jour la galerie
+            if (this.onProjectAdded) {
+                this.onProjectAdded(result);
+            }
+
+            // Optionnel : fermer la modale ou revenir à la vue galerie
+            this.isAddingPhoto = false;
+            this.render();
+
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout du projet:', error);
+            alert('Une erreur est survenue lors de l\'ajout du projet. Veuillez réessayer.');
+        }
+    }
+
+    getPhotoUploadAreaContent() {
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 58 58" fill="none">
+                <path d="M57 6H1C0.448 6 0 6.447 0 7V51C0 51.553 0.448 52 1 52H57C57.552 52 58 51.553 58 51V7C58 6.447 57.552 6 57 6ZM56 50H2V8H56V50Z" fill="#B9C5CC"/>
+                <path d="M16 28.138C19.071 28.138 21.569 25.64 21.569 22.569C21.569 19.498 19.071 17 16 17C12.929 17 10.431 19.498 10.431 22.569C10.431 25.64 12.929 28.138 16 28.138ZM16 19C17.968 19 19.569 20.602 19.569 22.569C19.569 24.536 17.968 26.138 16 26.138C14.032 26.138 12.431 24.537 12.431 22.569C12.431 20.601 14.032 19 16 19Z" fill="#B9C5CC"/>
+                <path d="M7.00004 46C7.23404 46 7.47004 45.918 7.66004 45.751L23.973 31.389L34.275 41.69C34.666 42.081 35.298 42.081 35.689 41.69C36.08 41.299 36.08 40.667 35.689 40.276L30.882 35.469L40.063 25.415L51.324 45.659C51.543 46.01 51.947 46.141 52.323 45.991C52.699 45.842 52.949 45.449 52.949 45.013V21C52.949 20.447 52.501 20 51.949 20C51.397 20 50.949 20.447 50.949 21V42.46L40.936 23.99C40.766 23.699 40.444 23.535 40.103 23.572C39.762 23.609 39.474 23.834 39.356 24.155L29.526 35.013L25.097 30.585C24.909 30.396 24.659 30.292 24.401 30.292C24.143 30.292 23.893 30.397 23.705 30.585L6.33904 45.751C5.94804 46.142 5.94804 46.774 6.33904 47.165C6.53004 47.357 6.76504 47.453 7.00004 47.453V46Z" fill="#B9C5CC"/>
+            </svg>
+            <input type="file" id="file-upload" accept="image/*" />
+            <button type="button" class="photo-upload-btn">+ Ajouter photo</button>
+            <span class="photo-upload-info">jpg, png : 4mo max</span>
+        `;
+    }
+
+    handleFileSelection(event) {
+        const file = event.target.files[0];
+        if (file) {
+            this.selectedFile = file;
+            const photoUploadArea = this.querySelector('.photo-upload-area');
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '200px';
+            photoUploadArea.innerHTML = '';
+            photoUploadArea.appendChild(img);
+        }
+        this.validateForm();
+    }
+    validateForm() {
+        const titre = this.querySelector('#titre').value;
+        const categorie = this.querySelector('#categorie').value;
+        const submitBtn = this.querySelector('.valider-btn');
+
+        if (this.selectedFile && titre && categorie) {
+            submitBtn.style.backgroundColor = '#1D6154';
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.style.backgroundColor = '#A7A7A7';
+            submitBtn.disabled = true;
+        }
     }
 
     render() {
-        this.innerHTML = `
+        this.innerHTML = this.isAddingPhoto ? this.renderAddPhotoForm() : this.renderGallery();
+        this.setupEventListeners();
+    }
+
+    renderGallery() {
+        return `
         <style>
             .modal-overlay {
                 position: fixed;
@@ -40,24 +175,43 @@ class Modal extends HTMLElement {
                 background-color: white;
                 padding: 20px;
                 border-radius: 10px;
-                max-width: 80%;
+                width: 100%;
+                max-width: 660px;
                 max-height: 80%;
+                box-sizing: border-box;             
                 overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
             .modal-header {
                 display: flex;
+                flex-direction: column;
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 20px;
+                width:100% ;
+                ._close {
+                    align-self: flex-end; 
+                }
+                h3 {
+                    font-size: 30px;
+                    margin-bottom: 25px;
+                
+                }
             }
             .close-modal {
                 cursor: pointer;
                 font-size: 24px;
             }
             .gallery-grid {
+                width: 100%;
+                max-width: 420px;   
+                margin-bottom: 25px;
+       
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+                gap: 20px 10px;
             }
             .gallery-item {
                 position: relative;
@@ -76,22 +230,36 @@ class Modal extends HTMLElement {
                 padding: 2px;
                 cursor: pointer;
             }
+            .sep{
+            display: block;
+                width: 100%;
+                max-width: 420px;
+                height: 1px;
+                background-color: black;
+                margin: 20px 0;
+                
+                box-sizing: border-box;
+            }
             .add-photo-btn {
                 display: block;
                 margin: 20px auto;
-                padding: 10px 20px;
+                padding: 10px 40px;
+                border-radius: 50px;
                 background-color: #1D6154;
                 color: white;
                 border: none;
-                border-radius: 5px;
+                /*border-radius: 5px;*/
                 cursor: pointer;
+                font-family: 'Syne', sans-serif;
             }
         </style>
         <div class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Galerie photo</h2>
-                    <span class="close-modal">&times;</span>
+                    <div class="_close">
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <h3>Galerie photo</h3>
                 </div>
                 <div class="gallery-grid">
                     ${this.projects.map(project => `
@@ -101,7 +269,160 @@ class Modal extends HTMLElement {
                         </div>
                     `).join('')}
                 </div>
+                <span class="sep"></span>
                 <button class="add-photo-btn">Ajouter une photo</button>
+            </div>
+        </div>
+        `;
+    }
+
+    renderAddPhotoForm() {
+        return `
+        <style>
+        .photo-upload-area img {
+                max-width: 100%;
+                max-height: 200px;
+                object-fit: contain;
+            }
+            #file-upload {
+                display: none;
+            }
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .modal-content {
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                width: 100%;
+                max-width: 660px;
+                max-height: 80%;
+                box-sizing: border-box;             
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .modal-header {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                width:100% ;
+                ._close {
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                }
+                h3 {
+                    font-size: 30px;
+                    margin-bottom: 25px;
+                
+                }
+            }
+            .close-modal {
+                cursor: pointer;
+                font-size: 24px;
+            }
+            .add-photo-form {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                width: 100%;
+                max-width: 420px;
+            }
+            .photo-upload-area {
+                background-color: #E8F1F6;
+                border-radius: 3px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            .photo-upload-area svg {
+                width: 58px;
+                height: 58px;
+                color: #B9C5CC;
+            }
+            .photo-upload-btn {
+                background-color: #CBD6DC;
+                border-radius: 50px;
+                padding: 10px 33px;
+                color: #306685;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+            }
+            .photo-upload-info {
+                font-size: 10px;
+                color: #444444;
+            }
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .form-group label {
+                color: #3D3D3D;
+                font-weight: 500;
+            }
+            .form-group input, .form-group select {
+                height: 51px;
+                font-size: 1.2em;
+                border: none;
+                box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+            }
+            .valider-btn {
+                background-color: #A7A7A7;
+                color: white;
+                border: none;
+                border-radius: 60px;
+                padding: 10px 49px;
+                font-family: 'Syne';
+                font-weight: 700;
+                font-size: 14px;
+                align-self: center;
+                cursor: pointer;
+            }
+        </style>
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="_close">
+                        <span class="back-modal">&larr;</span>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <h3>Ajout photo</h3>
+                </div>
+                <form class="add-photo-form">
+                    <div class="photo-upload-area">
+                        ${this.getPhotoUploadAreaContent()}
+                    </div>
+                    <div class="form-group">
+                        <label for="titre">Titre</label>
+                        <input type="text" id="titre" name="titre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categorie">Catégorie</label>
+                        <select id="categorie" name="categorie" required>
+                            <option value="">Sélectionner une catégorie</option>
+                            ${this.categories.map(category => `
+                                <option value="${category.id}">${category.name}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <button type="submit" class="valider-btn" disabled>Valider</button>
+                </form>
             </div>
         </div>
         `;
@@ -239,11 +560,22 @@ export class Projects extends HTMLElement {
 
     openModal() {
         if (!this.isModalOpen) {
-            const modal = new Modal(this.projects, this.closeModal.bind(this));
+            const modal = new Modal(
+                this.projects,
+                this.closeModal.bind(this),
+                this.categories,
+                this.onProjectAdded.bind(this)
+            );
             document.body.appendChild(modal);
             this.isModalOpen = true;
         }
     }
+
+    onProjectAdded(newProject) {
+        this.projects.push(newProject);
+        this.updateView();
+    }
+
 
     closeModal() {
         const modal = document.querySelector('project-modal');
