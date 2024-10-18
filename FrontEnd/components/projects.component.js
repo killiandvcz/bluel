@@ -16,7 +16,7 @@ class Modal extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        this.setupEventListeners();
+        // this.setupEventListeners();
     }
 
     setupEventListeners() {
@@ -108,8 +108,18 @@ class Modal extends HTMLElement {
 
             // Mettre à jour la galerie
             if (this.onProjectAdded) {
+                console.log('Appel de la fonction onProjectAdded');
                 this.onProjectAdded(result);
             }
+            console.log('Ajout du projet à la liste des projets', {result});
+            this.projects.push(result);
+            //delete doublon
+            this.projects = this.projects.filter((project, index, self) =>
+                index === self.findIndex((t) => (
+                    t.id === project.id
+                ))
+            );
+
 
             // Optionnel : fermer la modale ou revenir à la vue galerie
             this.isAddingPhoto = false;
@@ -122,6 +132,7 @@ class Modal extends HTMLElement {
     }
 
     async handleDeleteProject(projectId) {
+        console.log('Suppression du projet:', projectId);
         if (confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
             try {
                 const response = await fetch(`http://localhost:5678/api/works/${projectId}`, {
@@ -230,6 +241,7 @@ class Modal extends HTMLElement {
                 width:100% ;
                 ._close {
                     align-self: flex-end; 
+                    
                 }
                 h3 {
                     font-size: 30px;
@@ -359,6 +371,9 @@ class Modal extends HTMLElement {
                     display: flex;
                     justify-content: space-between;
                     width: 100%;
+                    span{
+                    cursor: pointer;
+                    }
                 }
                 h3 {
                     font-size: 30px;
@@ -410,14 +425,17 @@ class Modal extends HTMLElement {
                 gap: 10px;
             }
             .form-group label {
-                color: #3D3D3D;
-                font-weight: 500;
+                color: #515151;
+                font-weight: 600;
             }
             .form-group input, .form-group select {
+                box-sizing: border-box;
                 height: 51px;
-                font-size: 1.2em;
+                font-size: 16px;
+                font-family: "Work Sans", sans-serif;
                 border: none;
                 box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+                padding: 10px;
             }
             .valider-btn {
                 background-color: #A7A7A7;
@@ -577,7 +595,7 @@ export class Projects extends HTMLElement {
             <section id="portfolio">
                 <project-title></project-title>
                 <filter-buttons></filter-buttons>
-                <div class="gallery"></div>
+                <div class="main-gallery"></div>
             </section>
         `;
         this.initGallery();
@@ -610,6 +628,7 @@ export class Projects extends HTMLElement {
     }
 
     onProjectAdded(newProject) {
+        console.log('Nouveau projet ajouté:', newProject);
         this.projects.push(newProject);
         this.updateView();
     }
@@ -667,7 +686,7 @@ export class Projects extends HTMLElement {
     }
 
     displayProjects(projects) {
-        const gallery = this.querySelector('.gallery');
+        const gallery = this.querySelector('.main-gallery');
         gallery.innerHTML = '';
         const fragment = document.createDocumentFragment();
 

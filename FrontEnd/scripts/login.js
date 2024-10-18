@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = './index.html'; // Redirection vers la page d'accueil
             } else {
                 // Affiche un message d'erreur
-                displayError(data.message || 'Erreur de connexion. Veuillez vérifier vos identifiants.');
+                displayError('Erreur de connexion. Veuillez vérifier vos identifiants.');
             }
         } catch (error) {
             console.error('Erreur lors de la connexion:', error);

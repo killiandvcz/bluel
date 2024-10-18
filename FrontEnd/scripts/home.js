@@ -58,29 +58,29 @@ function displayWorks(works) {
 
 
 // Fonction pour créer les boutons de filtrage
-function createFilterButtons(categories) {
-    const filterContainer = document.querySelector('.filter-buttons');
-    filterContainer.innerHTML = ''; // Vider le conteneur existant
-
-    // Ajouter le bouton "Tous"
-    const allButton = document.createElement('button');
-    allButton.textContent = 'Tous';
-    allButton.classList.add('filter-button', 'active');
-    allButton.dataset.categoryId = 'all';
-    filterContainer.appendChild(allButton);
-
-    // Ajouter les boutons pour chaque catégorie
-    categories.forEach(category => {
-        const button = document.createElement('button');
-        button.textContent = category.name;
-        button.classList.add('filter-button');
-        button.dataset.categoryId = category.id;
-        filterContainer.appendChild(button);
-    });
-
-    // Ajouter les écouteurs d'événements pour le filtrage
-    filterContainer.addEventListener('click', filterWorks);
-}
+// function createFilterButtons(categories) {
+//     const filterContainer = document.querySelector('.filter-buttons');
+//     filterContainer.innerHTML = ''; // Vider le conteneur existant
+//
+//     // Ajouter le bouton "Tous"
+//     const allButton = document.createElement('button');
+//     allButton.textContent = 'Tous';
+//     allButton.classList.add('filter-button', 'active');
+//     allButton.dataset.categoryId = 'all';
+//     filterContainer.appendChild(allButton);
+//
+//     // Ajouter les boutons pour chaque catégorie
+//     categories.forEach(category => {
+//         const button = document.createElement('button');
+//         button.textContent = category.name;
+//         button.classList.add('filter-button');
+//         button.dataset.categoryId = category.id;
+//         filterContainer.appendChild(button);
+//     });
+//
+//     // Ajouter les écouteurs d'événements pour le filtrage
+//     filterContainer.addEventListener('click', filterWorks);
+// }
 
 
 // Fonction pour filtrer les works
