@@ -151,6 +151,12 @@ class Modal extends HTMLElement {
                 // Suppression réussie, mettre à jour l'interface
                 this.onProjectDeleted(projectId);
                 this.projects = this.projects.filter(project => project.id != projectId);
+                this.projects = this.projects.filter((project, index, self) =>
+                        index === self.findIndex((t) => (
+                            t.id === project.id
+                        ))
+                );
+                console.log(this.projects);
                 this.render();
             } catch (error) {
                 console.error('Erreur lors de la suppression du projet:', error);
@@ -553,7 +559,9 @@ class FilterButtons extends HTMLElement {
     }
 
     render() {
+
         if (!auth.token) {
+
             this.innerHTML = `
                 <div class="filter-buttons">
                     <button class="filter-button active" data-category-id="all">Tous</button>
@@ -607,6 +615,11 @@ export class Projects extends HTMLElement {
     }
 
     updateView() {
+        this.projects = this.projects.filter((project, index, self) =>
+                index === self.findIndex((t) => (
+                    t.id === project.id
+                ))
+        );
         const title = new ProjectTitle(this.openModal.bind(this));
         this.querySelector('project-title').replaceWith(title);
         this.updateFilterButtons();
@@ -634,7 +647,10 @@ export class Projects extends HTMLElement {
     }
 
     onProjectDeleted(projectId) {
+        console.log('projets avant suppression', this.projects);
         this.projects = this.projects.filter(project => project.id != projectId);
+
+        console.log('projets affichés', this.projects);
         this.updateView();
     }
 
@@ -653,7 +669,7 @@ export class Projects extends HTMLElement {
             filterButtonsElement.remove();
         }
         const newFilterButtons = new FilterButtons(this.categories, this.handleFilter.bind(this));
-        this.querySelector('#portfolio').insertBefore(newFilterButtons, this.querySelector('.gallery'));
+        this.querySelector('#portfolio').insertBefore(newFilterButtons, this.querySelector('.main-gallery'));
     }
 
     async fetchProjects() {
