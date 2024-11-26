@@ -565,7 +565,7 @@ class FilterButtons extends HTMLElement {
             this.innerHTML = `
                 <div class="filter-buttons">
                     <button class="filter-button active" data-category-id="all">Tous</button>
-                    ${this.categories.map(category => `
+                    ${this.categories?.map(category => `
                         <button class="filter-button" data-category-id="${category.id}">${category.name}</button>
                     `).join('')}
                 </div>
