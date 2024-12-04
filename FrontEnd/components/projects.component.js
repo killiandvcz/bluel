@@ -1,6 +1,9 @@
 // projects.js
 import { auth } from "../scripts/auth.class.js";
 
+
+
+
 class Modal extends HTMLElement {
     constructor(projects, closeModal, categories, onProjectAdded, onProjectDeleted) {
         super();
@@ -99,7 +102,7 @@ class Modal extends HTMLElement {
             }
 
             const result = await response.json();
-            console.log('Projet ajouté avec succès:', result);
+
 
             // Réinitialiser le formulaire
             this.querySelector('.add-photo-form').reset();
@@ -108,16 +111,16 @@ class Modal extends HTMLElement {
 
             // Mettre à jour la galerie
             if (this.onProjectAdded) {
-                console.log('Appel de la fonction onProjectAdded');
+
                 this.onProjectAdded(result);
             }
-            console.log('Ajout du projet à la liste des projets', {result});
+
             this.projects.push(result);
             //delete doublon
             this.projects = this.projects.filter((project, index, self) =>
-                index === self.findIndex((t) => (
-                    t.id === project.id
-                ))
+                    index === self.findIndex((t) => (
+                        t.id === project.id
+                    ))
             );
 
 
@@ -132,7 +135,7 @@ class Modal extends HTMLElement {
     }
 
     async handleDeleteProject(projectId) {
-        console.log('Suppression du projet:', projectId);
+
         if (confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
             try {
                 const response = await fetch(`http://localhost:5678/api/works/${projectId}`, {
@@ -142,7 +145,7 @@ class Modal extends HTMLElement {
                     }
                 });
 
-                console.log('Réponse de la suppression:', response);
+
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -156,7 +159,7 @@ class Modal extends HTMLElement {
                             t.id === project.id
                         ))
                 );
-                console.log(this.projects);
+
                 this.render();
             } catch (error) {
                 console.error('Erreur lors de la suppression du projet:', error);
@@ -167,11 +170,10 @@ class Modal extends HTMLElement {
 
     getPhotoUploadAreaContent() {
         return `
-            <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 58 58" fill="none">
-                <path d="M57 6H1C0.448 6 0 6.447 0 7V51C0 51.553 0.448 52 1 52H57C57.552 52 58 51.553 58 51V7C58 6.447 57.552 6 57 6ZM56 50H2V8H56V50Z" fill="#B9C5CC"/>
-                <path d="M16 28.138C19.071 28.138 21.569 25.64 21.569 22.569C21.569 19.498 19.071 17 16 17C12.929 17 10.431 19.498 10.431 22.569C10.431 25.64 12.929 28.138 16 28.138ZM16 19C17.968 19 19.569 20.602 19.569 22.569C19.569 24.536 17.968 26.138 16 26.138C14.032 26.138 12.431 24.537 12.431 22.569C12.431 20.601 14.032 19 16 19Z" fill="#B9C5CC"/>
-                <path d="M7.00004 46C7.23404 46 7.47004 45.918 7.66004 45.751L23.973 31.389L34.275 41.69C34.666 42.081 35.298 42.081 35.689 41.69C36.08 41.299 36.08 40.667 35.689 40.276L30.882 35.469L40.063 25.415L51.324 45.659C51.543 46.01 51.947 46.141 52.323 45.991C52.699 45.842 52.949 45.449 52.949 45.013V21C52.949 20.447 52.501 20 51.949 20C51.397 20 50.949 20.447 50.949 21V42.46L40.936 23.99C40.766 23.699 40.444 23.535 40.103 23.572C39.762 23.609 39.474 23.834 39.356 24.155L29.526 35.013L25.097 30.585C24.909 30.396 24.659 30.292 24.401 30.292C24.143 30.292 23.893 30.397 23.705 30.585L6.33904 45.751C5.94804 46.142 5.94804 46.774 6.33904 47.165C6.53004 47.357 6.76504 47.453 7.00004 47.453V46Z" fill="#B9C5CC"/>
-            </svg>
+            <svg width="70" height="61" viewBox="0 0 70 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M60.5517 6.88793C61.7228 6.88793 62.681 7.84612 62.681 9.01724V51.5768L62.0156 50.7118L43.9165 27.2894C43.3176 26.5042 42.3727 26.0517 41.3879 26.0517C40.4031 26.0517 39.4715 26.5042 38.8594 27.2894L27.8136 41.5824L23.7546 35.8998C23.1557 35.0614 22.1975 34.569 21.1595 34.569C20.1214 34.569 19.1632 35.0614 18.5644 35.9131L7.91783 50.8183L7.31896 51.6434V51.6034V9.01724C7.31896 7.84612 8.27715 6.88793 9.44827 6.88793H60.5517ZM9.44827 0.5C4.75048 0.5 0.93103 4.31945 0.93103 9.01724V51.6034C0.93103 56.3012 4.75048 60.1207 9.44827 60.1207H60.5517C65.2495 60.1207 69.069 56.3012 69.069 51.6034V9.01724C69.069 4.31945 65.2495 0.5 60.5517 0.5H9.44827ZM20.0948 26.0517C20.9337 26.0517 21.7644 25.8865 22.5394 25.5655C23.3144 25.2444 24.0186 24.7739 24.6118 24.1807C25.2049 23.5876 25.6755 22.8834 25.9965 22.1083C26.3175 21.3333 26.4828 20.5027 26.4828 19.6638C26.4828 18.8249 26.3175 17.9943 25.9965 17.2192C25.6755 16.4442 25.2049 15.74 24.6118 15.1468C24.0186 14.5537 23.3144 14.0831 22.5394 13.7621C21.7644 13.4411 20.9337 13.2759 20.0948 13.2759C19.2559 13.2759 18.4253 13.4411 17.6503 13.7621C16.8752 14.0831 16.171 14.5537 15.5779 15.1468C14.9847 15.74 14.5142 16.4442 14.1931 17.2192C13.8721 17.9943 13.7069 18.8249 13.7069 19.6638C13.7069 20.5027 13.8721 21.3333 14.1931 22.1083C14.5142 22.8834 14.9847 23.5876 15.5779 24.1807C16.171 24.7739 16.8752 25.2444 17.6503 25.5655C18.4253 25.8865 19.2559 26.0517 20.0948 26.0517Z" fill="#B9C5CC"/>
+</svg>
+
             <input type="file" id="file-upload" accept="image/*" />
             <button type="button" class="photo-upload-btn">+ Ajouter photo</button>
             <span class="photo-upload-info">jpg, png : 4mo max</span>
@@ -180,7 +182,16 @@ class Modal extends HTMLElement {
 
     handleFileSelection(event) {
         const file = event.target.files[0];
+        const maxSize = 4 * 1024 * 1024; // 4 Mo en octets
+
         if (file) {
+            if (file.size > maxSize) {
+                alert("Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.");
+                event.target.value = ''; // Réinitialise l'input file
+                this.selectedFile = null;
+                return;
+            }
+
             this.selectedFile = file;
             const photoUploadArea = this.querySelector('.photo-upload-area');
             const img = document.createElement('img');
@@ -192,6 +203,7 @@ class Modal extends HTMLElement {
         }
         this.validateForm();
     }
+
     validateForm() {
         const titre = this.querySelector('#titre').value;
         const categorie = this.querySelector('#categorie').value;
@@ -213,101 +225,6 @@ class Modal extends HTMLElement {
 
     renderGallery() {
         return `
-        <style>
-            .modal-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .modal-content {
-                background-color: white;
-                padding: 20px;
-                border-radius: 10px;
-                width: 100%;
-                max-width: 660px;
-                max-height: 80%;
-                box-sizing: border-box;             
-                overflow-y: auto;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            .modal-header {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-                width:100% ;
-                ._close {
-                    align-self: flex-end; 
-                    
-                }
-                h3 {
-                    font-size: 30px;
-                    margin-bottom: 25px;
-                
-                }
-            }
-            .close-modal {
-                cursor: pointer;
-                font-size: 24px;
-            }
-            .gallery-grid {
-                width: 100%;
-                max-width: 420px;   
-                margin-bottom: 25px;
-       
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-                gap: 20px 10px;
-            }
-            .gallery-item {
-                position: relative;
-            }
-            .gallery-item img {
-                width: 100%;
-                height: auto;
-                object-fit: cover;
-            }
-            .delete-icon {
-                position: absolute;
-                top: 5px;
-                right: 5px;
-                background-color: black;
-                color: white;
-                padding: 2px;
-                cursor: pointer;
-            }
-            .sep{
-            display: block;
-                width: 100%;
-                max-width: 420px;
-                height: 1px;
-                background-color: black;
-                margin: 20px 0;
-                
-                box-sizing: border-box;
-            }
-            .add-photo-btn {
-                display: block;
-                margin: 20px auto;
-                padding: 10px 40px;
-                border-radius: 50px;
-                background-color: #1D6154;
-                color: white;
-                border: none;
-                /*border-radius: 5px;*/
-                cursor: pointer;
-                font-family: 'Syne', sans-serif;
-            }
-        </style>
         <div class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
@@ -320,7 +237,11 @@ class Modal extends HTMLElement {
                     ${this.projects.map(project => `
                         <div class="gallery-item" data-project-id="${project.id}">
                             <img src="${project.imageUrl}" alt="${project.title}">
-                            <span class="delete-icon">🗑️</span>
+                            <span class="delete-icon">
+                                <svg width="9" height="11" viewBox="0 0 9 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.71607 0.35558C2.82455 0.136607 3.04754 0 3.29063 0H5.70938C5.95246 0 6.17545 0.136607 6.28393 0.35558L6.42857 0.642857H8.35714C8.71272 0.642857 9 0.930134 9 1.28571C9 1.64129 8.71272 1.92857 8.35714 1.92857H0.642857C0.287277 1.92857 0 1.64129 0 1.28571C0 0.930134 0.287277 0.642857 0.642857 0.642857H2.57143L2.71607 0.35558ZM0.642857 2.57143H8.35714V9C8.35714 9.70915 7.78058 10.2857 7.07143 10.2857H1.92857C1.21942 10.2857 0.642857 9.70915 0.642857 9V2.57143ZM2.57143 3.85714C2.39464 3.85714 2.25 4.00179 2.25 4.17857V8.67857C2.25 8.85536 2.39464 9 2.57143 9C2.74821 9 2.89286 8.85536 2.89286 8.67857V4.17857C2.89286 4.00179 2.74821 3.85714 2.57143 3.85714ZM4.5 3.85714C4.32321 3.85714 4.17857 4.00179 4.17857 4.17857V8.67857C4.17857 8.85536 4.32321 9 4.5 9C4.67679 9 4.82143 8.85536 4.82143 8.67857V4.17857C4.82143 4.00179 4.67679 3.85714 4.5 3.85714ZM6.42857 3.85714C6.25179 3.85714 6.10714 4.00179 6.10714 4.17857V8.67857C6.10714 8.85536 6.25179 9 6.42857 9C6.60536 9 6.75 8.85536 6.75 8.67857V4.17857C6.75 4.00179 6.60536 3.85714 6.42857 3.85714Z" fill="white"/>
+                                </svg>
+                            </span>
                         </div>
                     `).join('')}
                 </div>
@@ -333,134 +254,16 @@ class Modal extends HTMLElement {
 
     renderAddPhotoForm() {
         return `
-        <style>
-        .photo-upload-area img {
-                max-width: 100%;
-                max-height: 200px;
-                object-fit: contain;
-            }
-            #file-upload {
-                display: none;
-            }
-            .modal-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .modal-content {
-                background-color: white;
-                padding: 20px;
-                border-radius: 10px;
-                width: 100%;
-                max-width: 660px;
-                max-height: 80%;
-                box-sizing: border-box;             
-                overflow-y: auto;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            .modal-header {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-                width:100% ;
-                ._close {
-                    display: flex;
-                    justify-content: space-between;
-                    width: 100%;
-                    span{
-                    cursor: pointer;
-                    }
-                }
-                h3 {
-                    font-size: 30px;
-                    margin-bottom: 25px;
-                
-                }
-            }
-            .close-modal {
-                cursor: pointer;
-                font-size: 24px;
-            }
-            .add-photo-form {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                width: 100%;
-                max-width: 420px;
-            }
-            .photo-upload-area {
-                background-color: #E8F1F6;
-                border-radius: 3px;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-            .photo-upload-area svg {
-                width: 58px;
-                height: 58px;
-                color: #B9C5CC;
-            }
-            .photo-upload-btn {
-                background-color: #CBD6DC;
-                border-radius: 50px;
-                padding: 10px 33px;
-                color: #306685;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-            }
-            .photo-upload-info {
-                font-size: 10px;
-                color: #444444;
-            }
-            .form-group {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .form-group label {
-                color: #515151;
-                font-weight: 600;
-            }
-            .form-group input, .form-group select {
-                box-sizing: border-box;
-                height: 51px;
-                font-size: 16px;
-                font-family: "Work Sans", sans-serif;
-                border: none;
-                box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
-                padding: 10px;
-            }
-            .valider-btn {
-                background-color: #A7A7A7;
-                color: white;
-                border: none;
-                border-radius: 60px;
-                padding: 10px 49px;
-                font-family: 'Syne';
-                font-weight: 700;
-                font-size: 14px;
-                align-self: center;
-                cursor: pointer;
-            }
-        </style>
         <div class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="_close">
-                        <span class="back-modal">&larr;</span>
+                        <span class="back-modal">
+                        <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0.439478 7.94458C-0.146493 8.53055 -0.146493 9.48217 0.439478 10.0681L7.9399 17.5686C8.52587 18.1545 9.47748 18.1545 10.0635 17.5686C10.6494 16.9826 10.6494 16.031 10.0635 15.445L5.11786 10.5041H19.4999C20.3297 10.5041 21 9.83375 21 9.00402C21 8.17428 20.3297 7.50393 19.4999 7.50393H5.12255L10.0588 2.56303C10.6447 1.97706 10.6447 1.02545 10.0588 0.439478C9.47279 -0.146493 8.52118 -0.146493 7.93521 0.439478L0.43479 7.9399L0.439478 7.94458Z" fill="black"/>
+</svg>
+
+</span>
                         <span class="close-modal">&times;</span>
                     </div>
                     <h3>Ajout photo</h3>
@@ -509,28 +312,6 @@ class ProjectTitle extends HTMLElement {
 
     render() {
         this.innerHTML = `
-        <style>
-.projectsHead {
-align-items: center;
-justify-content: center;
-display: flex;
-margin-bottom: 30px;
-gap: 25px;
-h2{
-margin: 0 !important;
-}
-.edit-button{
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 10px;
-transition: all 0.3s ease;
-&:hover{
-color: #555555;
-}
-}
-}
-</style>
         <span class="projectsHead">
             <h2>Mes Projets</h2>
             ${auth.token ? `<span class="edit-button">
@@ -545,6 +326,11 @@ color: #555555;
 }
 
 customElements.define('project-title', ProjectTitle);
+
+
+
+
+
 
 class FilterButtons extends HTMLElement {
     constructor(categories, onFilter) {
@@ -584,6 +370,9 @@ class FilterButtons extends HTMLElement {
 }
 
 customElements.define('filter-buttons', FilterButtons);
+
+
+
 
 export class Projects extends HTMLElement {
     constructor() {
@@ -641,16 +430,16 @@ export class Projects extends HTMLElement {
     }
 
     onProjectAdded(newProject) {
-        console.log('Nouveau projet ajouté:', newProject);
+
         this.projects.push(newProject);
         this.updateView();
     }
 
     onProjectDeleted(projectId) {
-        console.log('projets avant suppression', this.projects);
+
         this.projects = this.projects.filter(project => project.id != projectId);
 
-        console.log('projets affichés', this.projects);
+
         this.updateView();
     }
 
